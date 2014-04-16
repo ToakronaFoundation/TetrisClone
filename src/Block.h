@@ -105,6 +105,8 @@ bool Block_getSpace(const struct Block* block,unsigned short x,unsigned short y)
  */
 bool Block_setSpace(struct Block* block,unsigned short x,unsigned short y,bool state);
 
+bool Block_setSpacesFromBitlist(struct Block* block,byte* bitlist,size_t size);
+
 /**
  * Gets the block's total width
  *
