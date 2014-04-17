@@ -2,7 +2,15 @@
 #define __TOAKRONAF_TETRIS_BLOCK_H_INCLUDED__
 
 #include <stdbool.h>
+#include <string.h>
 #include "Types.h"
+
+enum BlockRotation{
+	BLOCK_ROTATION_NONE,
+	BLOCK_ROTATION_LEFT,
+	BLOCK_ROTATION_HALFTURN,
+	BLOCK_ROTATION_RIGHT
+};
 
 /**
  * Represents a block
@@ -10,7 +18,7 @@
 struct Block{
 	unsigned short width;
 	unsigned short height;
-
+	
 	byte spaces[];
 };
 
@@ -25,6 +33,8 @@ struct Block{
  */
 struct Block* Block_alloc(unsigned short width,unsigned short height);
 
+struct Block* Block_copy(const struct Block* block,struct Block* out);
+
 /**
  * Rotates the block to the left (anti-clockwise)
  *
@@ -33,7 +43,7 @@ struct Block* Block_alloc(unsigned short width,unsigned short height);
  *   block = rotateLeft(rotateRight(block))
  *
  * @param block The block to be rotated
- * @param out   Output for the rotated block. Note that it should be possible for `block` and `out` to overlap in memory.
+ * @param out   Output for the rotated block. Note that `block` and `out` should not overlap in memory and also should not point to the same data
  * @return      Returns `out`
  */
 struct Block* Block_rotateLeft(const struct Block* block,struct Block* out);
@@ -46,7 +56,7 @@ struct Block* Block_rotateLeft(const struct Block* block,struct Block* out);
  *   block = rotateRight(rotateLeft(block))
  *
  * @param block The block to be rotated
- * @param out   Output for the rotated block. Note that it should be possible for `block` and `out` to overlap in memory.
+ * @param out   Output for the rotated block. Note that `block` and `out` should not overlap in memory and also should not point to the same data
  * @return      Returns `out`
  */
 struct Block* Block_rotateRight(const struct Block* block,struct Block* out);
@@ -60,7 +70,7 @@ struct Block* Block_rotateRight(const struct Block* block,struct Block* out);
  *   rotateHalfTurn(block) = rotateLeft(rotateLeft(block))
  *
  * @param block The block to be rotated
- * @param out   Output for the rotated block. Note that it should be possible for `block` and `out` to overlap in memory.
+ * @param out   Output for the rotated block. Note that `block` and `out` should not overlap in memory and also should not point to the same data.
  * @return      Returns `out`
  */
 struct Block* Block_rotateHalfTurn(const struct Block* block,struct Block* out);
@@ -72,7 +82,7 @@ struct Block* Block_rotateHalfTurn(const struct Block* block,struct Block* out);
  *   block = invertX(invertX(block))
  *
  * @param block The block to be inverted
- * @param out   Output for the inverted block. Note that it should be possible for `block` and `out` to overlap in memory.
+ * @param out   Output for the inverted block. Note that `block` and `out` should not overlap in memory and also should not point to the same data
  * @return      Returns `out`
  */
 struct Block* Block_invertX(const struct Block* block,struct Block* out);
@@ -84,7 +94,7 @@ struct Block* Block_invertX(const struct Block* block,struct Block* out);
  *   block = invertY(invertY(block))
  *
  * @param block The block to be inverted
- * @param out   Output for the inverted block. Note that it should be possible for `block` and `out` to overlap in memory.
+ * @param out   Output for the inverted block. Note that `block` and `out` should not overlap in memory and also should not point to the same data
  * @return      Returns `out`
  */
 struct Block* Block_invertY(const struct Block* block,struct Block* out);
@@ -105,7 +115,9 @@ bool Block_getSpace(const struct Block* block,unsigned short x,unsigned short y)
  */
 bool Block_setSpace(struct Block* block,unsigned short x,unsigned short y,bool state);
 
-bool Block_setSpacesFromBitlist(struct Block* block,byte* bitlist,size_t size);
+inline void Block_setSpacesFromBitlist(struct Block* block,byte* bitlist,size_t size){
+	memcpy(block->spaces,bitlist,size);
+}
 
 /**
  * Gets the block's total width

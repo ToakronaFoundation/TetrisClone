@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project (tetrisclone)
 
-file(GLOB_RECURSE SOURCES "*.c")
-file(GLOB_RECURSE HEADERS "*.h")
+file(GLOB_RECURSE SOURCES "src/*.c")
+file(GLOB_RECURSE HEADERS "src/*.h")
 
 set (INCLUDE_DIRS "src")
 foreach (_headerFile ${HEADERS})
@@ -20,7 +20,7 @@ ADD_DEFINITIONS(
 	-O3
 )
 
-add_executable(tetrisclone src/Main)
+add_executable(tetrisclone ${SOURCES})
 
 find_package(PkgConfig REQUIRED)
 

@@ -1,7 +1,7 @@
 #ifndef __TOAKRONAF_TETRIS_PLAYER_H_INCLUDED__
 #define __TOAKRONAF_TETRIS_PLAYER_H_INCLUDED__
 
-struct Block;
+#include "Block.h"
 
 struct Player{
 	unsigned short x;
@@ -9,7 +9,13 @@ struct Player{
 
 	unsigned short fallTimeCounter;
 
-	struct Block* selectedBlock;
+	struct{
+		const struct Block* original;
+		struct Block* copy;
+		enum BlockRotation rotation;
+	}selectedBlock;
 };
+
+void Player_selectBlock(struct Player* player,const struct Block* block);
 
 #endif
