@@ -36,37 +36,82 @@ static void onResize(GLFWwindow* window,int width,int height){
 }
 
 static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifiers){
-	switch(key){
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window,true);
-			break;
-		case GLFW_KEY_X:
-			if(action == GLFW_PRESS){
+	if(action == GLFW_PRESS){
+		switch(key){
+			case GLFW_KEY_ESCAPE:
+				glfwSetWindowShouldClose(window,true);
+				break;
+			case GLFW_KEY_W:{
+				struct Player*const players = glfwGetWindowUserPointer(window);
+				Block_copy(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+				players[0].selectedBlock.rotation = BLOCK_ROTATION_NONE;
+			}	break;
+			case GLFW_KEY_A:{
+				struct Player*const players = glfwGetWindowUserPointer(window);
+				Block_rotateLeft(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+				players[0].selectedBlock.rotation = BLOCK_ROTATION_LEFT;
+			}	break;
+			case GLFW_KEY_S:{
+				struct Player*const players = glfwGetWindowUserPointer(window);
+				Block_rotateHalfTurn(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+				players[0].selectedBlock.rotation = BLOCK_ROTATION_HALFTURN;
+			}	break;
+			case GLFW_KEY_D:{
+				struct Player*const players = glfwGetWindowUserPointer(window);
+				Block_rotateRight(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+				players[0].selectedBlock.rotation = BLOCK_ROTATION_RIGHT;
+			}	break;
+			case GLFW_KEY_X:{
 				struct Player*const players = glfwGetWindowUserPointer(window);
 				switch(players[0].selectedBlock.rotation){
 					case BLOCK_ROTATION_NONE:
-						Block_copy(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+						Block_rotateLeft(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+						players[0].selectedBlock.rotation = BLOCK_ROTATION_LEFT;
+						break;
+					case BLOCK_ROTATION_LEFT:
+						Block_rotateHalfTurn(players[0].selectedBlock.original,players[0].selectedBlock.copy);
 						players[0].selectedBlock.rotation = BLOCK_ROTATION_HALFTURN;
 						break;
 					case BLOCK_ROTATION_HALFTURN:
-						Block_rotateHalfTurn(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+						Block_rotateRight(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+						players[0].selectedBlock.rotation = BLOCK_ROTATION_RIGHT;
+						break;
+					case BLOCK_ROTATION_RIGHT:
+						Block_copy(players[0].selectedBlock.original,players[0].selectedBlock.copy);
 						players[0].selectedBlock.rotation = BLOCK_ROTATION_NONE;
 						break;
 				}
-			}
-			break;
-		case GLFW_KEY_LEFT:
-			if(action == GLFW_PRESS){
+			}	break;
+			case GLFW_KEY_C:{
+				struct Player*const players = glfwGetWindowUserPointer(window);
+				switch(players[0].selectedBlock.rotation){
+					case BLOCK_ROTATION_NONE:
+						Block_rotateRight(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+						players[0].selectedBlock.rotation = BLOCK_ROTATION_RIGHT;
+						break;
+					case BLOCK_ROTATION_LEFT:
+						Block_copy(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+						players[0].selectedBlock.rotation = BLOCK_ROTATION_NONE;
+						break;
+					case BLOCK_ROTATION_HALFTURN:
+						Block_rotateLeft(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+						players[0].selectedBlock.rotation = BLOCK_ROTATION_LEFT;
+						break;
+					case BLOCK_ROTATION_RIGHT:
+						Block_rotateHalfTurn(players[0].selectedBlock.original,players[0].selectedBlock.copy);
+						players[0].selectedBlock.rotation = BLOCK_ROTATION_HALFTURN;
+						break;
+				}
+			}	break;
+			case GLFW_KEY_LEFT:{
 				struct Player*const players = glfwGetWindowUserPointer(window);
 				--players[0].x;
-			}
-			break;
-		case GLFW_KEY_RIGHT:
-			if(action == GLFW_PRESS){
+			}	break;
+			case GLFW_KEY_RIGHT:{
 				struct Player*const players = glfwGetWindowUserPointer(window);
 				++players[0].x;
-			}
-			break;
+			}	break;
+		}
 	}
 }
 
@@ -107,7 +152,7 @@ int main(int argc,const char* argv[]){
 	byte spaceBuffer;
 	
 	struct Block* block = Block_alloc(3,2);
-	spaceBuffer = 0b111010;
+	spaceBuffer = 0b100111;
 	Block_setSpacesFromBitlist(block,&spaceBuffer,1);
 	
 	//Initiate players
@@ -115,7 +160,7 @@ int main(int argc,const char* argv[]){
 		.x = 3,
 		.y = 5,
 		.fallTimeCounter = 0,
-		.selectedBlock = {NULL,NULL}
+		.selectedBlock = {NULL,NULL,BLOCK_ROTATION_NONE}
 	};
 	Player_selectBlock(&players[0],block);
 	glfwSetWindowUserPointer(gameWindow,&players[0]);//TODO: Temporary code for testing. Also change the onKey function after changing this (the glfwGetWindowUserPointer(window) calls)
