@@ -99,30 +99,45 @@ int main(int argc,const char* argv[]){
 	glPointSize(GAME_GRID_SIZE);
 
 	//Initiate block types
-	unsigned short blockCount = 5;
+	unsigned short blockCount = 7;
 	struct Block* blocks[blockCount];
 	{
 		byte spaceBuffer;
 
+		//J
 		blocks[0] = Block_alloc(3,2);
 		spaceBuffer = 0b100111;
 		Block_setSpacesFromBitlist(blocks[0],&spaceBuffer,1);
 
+		//T
 		blocks[1] = Block_alloc(3,2);
 		spaceBuffer = 0b010111;
 		Block_setSpacesFromBitlist(blocks[1],&spaceBuffer,1);
 
+		//L
 		blocks[2] = Block_alloc(3,2);
 		spaceBuffer = 0b001111;
 		Block_setSpacesFromBitlist(blocks[2],&spaceBuffer,1);
 
+		//O
 		blocks[3] = Block_alloc(4,1);
 		spaceBuffer = 0b1111;
 		Block_setSpacesFromBitlist(blocks[3],&spaceBuffer,1);
 
+		//I
 		blocks[4] = Block_alloc(2,2);
 		spaceBuffer = 0b1111;
 		Block_setSpacesFromBitlist(blocks[4],&spaceBuffer,1);
+
+		//S
+		blocks[5] = Block_alloc(3,2);
+		spaceBuffer = 0b011110;
+		Block_setSpacesFromBitlist(blocks[5],&spaceBuffer,1);
+
+		//Z
+		blocks[6] = Block_alloc(3,2);
+		spaceBuffer = 0b110011;
+		Block_setSpacesFromBitlist(blocks[6],&spaceBuffer,1);
 	}
 	
 	//Initiate players
