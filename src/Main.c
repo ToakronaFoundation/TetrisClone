@@ -41,67 +41,13 @@ static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifie
 			case GLFW_KEY_ESCAPE:
 				glfwSetWindowShouldClose(window,true);
 				break;
-			case GLFW_KEY_W:{
-				struct Player*const players = glfwGetWindowUserPointer(window);
-				Block_copy(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-				players[0].selectedBlock.rotation = BLOCK_ROTATION_NONE;
-			}	break;
-			case GLFW_KEY_A:{
-				struct Player*const players = glfwGetWindowUserPointer(window);
-				Block_rotateLeft(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-				players[0].selectedBlock.rotation = BLOCK_ROTATION_LEFT;
-			}	break;
-			case GLFW_KEY_S:{
-				struct Player*const players = glfwGetWindowUserPointer(window);
-				Block_rotateHalfTurn(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-				players[0].selectedBlock.rotation = BLOCK_ROTATION_HALFTURN;
-			}	break;
-			case GLFW_KEY_D:{
-				struct Player*const players = glfwGetWindowUserPointer(window);
-				Block_rotateRight(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-				players[0].selectedBlock.rotation = BLOCK_ROTATION_RIGHT;
-			}	break;
 			case GLFW_KEY_X:{
 				struct Player*const players = glfwGetWindowUserPointer(window);
-				switch(players[0].selectedBlock.rotation){
-					case BLOCK_ROTATION_NONE:
-						Block_rotateLeft(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-						players[0].selectedBlock.rotation = BLOCK_ROTATION_LEFT;
-						break;
-					case BLOCK_ROTATION_LEFT:
-						Block_rotateHalfTurn(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-						players[0].selectedBlock.rotation = BLOCK_ROTATION_HALFTURN;
-						break;
-					case BLOCK_ROTATION_HALFTURN:
-						Block_rotateRight(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-						players[0].selectedBlock.rotation = BLOCK_ROTATION_RIGHT;
-						break;
-					case BLOCK_ROTATION_RIGHT:
-						Block_copy(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-						players[0].selectedBlock.rotation = BLOCK_ROTATION_NONE;
-						break;
-				}
+				Player_rotateBlockLeft(&players[0]);
 			}	break;
 			case GLFW_KEY_C:{
 				struct Player*const players = glfwGetWindowUserPointer(window);
-				switch(players[0].selectedBlock.rotation){
-					case BLOCK_ROTATION_NONE:
-						Block_rotateRight(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-						players[0].selectedBlock.rotation = BLOCK_ROTATION_RIGHT;
-						break;
-					case BLOCK_ROTATION_LEFT:
-						Block_copy(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-						players[0].selectedBlock.rotation = BLOCK_ROTATION_NONE;
-						break;
-					case BLOCK_ROTATION_HALFTURN:
-						Block_rotateLeft(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-						players[0].selectedBlock.rotation = BLOCK_ROTATION_LEFT;
-						break;
-					case BLOCK_ROTATION_RIGHT:
-						Block_rotateHalfTurn(players[0].selectedBlock.original,players[0].selectedBlock.copy);
-						players[0].selectedBlock.rotation = BLOCK_ROTATION_HALFTURN;
-						break;
-				}
+				Player_rotateBlockRight(&players[0]);
 			}	break;
 			case GLFW_KEY_LEFT:{
 				struct Player*const players = glfwGetWindowUserPointer(window);
@@ -110,6 +56,10 @@ static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifie
 			case GLFW_KEY_RIGHT:{
 				struct Player*const players = glfwGetWindowUserPointer(window);
 				++players[0].x;
+			}	break;
+			case GLFW_KEY_DOWN:{
+				struct Player*const players = glfwGetWindowUserPointer(window);
+				++players[0].y;
 			}	break;
 		}
 	}
@@ -149,11 +99,31 @@ int main(int argc,const char* argv[]){
 	glPointSize(GAME_GRID_SIZE);
 
 	//Initiate block types
-	byte spaceBuffer;
-	
-	struct Block* block = Block_alloc(3,2);
-	spaceBuffer = 0b100111;
-	Block_setSpacesFromBitlist(block,&spaceBuffer,1);
+	unsigned short blockCount = 5;
+	struct Block* blocks[blockCount];
+	{
+		byte spaceBuffer;
+
+		blocks[0] = Block_alloc(3,2);
+		spaceBuffer = 0b100111;
+		Block_setSpacesFromBitlist(blocks[0],&spaceBuffer,1);
+
+		blocks[1] = Block_alloc(3,2);
+		spaceBuffer = 0b010111;
+		Block_setSpacesFromBitlist(blocks[1],&spaceBuffer,1);
+
+		blocks[2] = Block_alloc(3,2);
+		spaceBuffer = 0b001111;
+		Block_setSpacesFromBitlist(blocks[2],&spaceBuffer,1);
+
+		blocks[3] = Block_alloc(4,1);
+		spaceBuffer = 0b1111;
+		Block_setSpacesFromBitlist(blocks[3],&spaceBuffer,1);
+
+		blocks[4] = Block_alloc(2,2);
+		spaceBuffer = 0b1111;
+		Block_setSpacesFromBitlist(blocks[4],&spaceBuffer,1);
+	}
 	
 	//Initiate players
 	players[0] = (struct Player){
@@ -162,7 +132,8 @@ int main(int argc,const char* argv[]){
 		.fallTimeCounter = 0,
 		.selectedBlock = {NULL,NULL,BLOCK_ROTATION_NONE}
 	};
-	Player_selectBlock(&players[0],block);
+	playerCount = 1;
+	Player_selectBlock(&players[0],blocks[0]);
 	glfwSetWindowUserPointer(gameWindow,&players[0]);//TODO: Temporary code for testing. Also change the onKey function after changing this (the glfwGetWindowUserPointer(window) calls)
 
 	//Game Loop
@@ -172,39 +143,42 @@ int main(int argc,const char* argv[]){
 
 		//Update
 		++players[0].fallTimeCounter;
-		if(players[0].fallTimeCounter>60){
+		if(players[0].fallTimeCounter>60){//TODO: 1 block per 60 frames is the fallspeed at the moment. Organize code and change to more customizable
 			++players[0].y;
 			players[0].fallTimeCounter=0;
+
+			//If the block is lower than the floor
+			if(players[0].y>10){//TODO: 10 is the height at the moment. Organize code and change to more customizable later
+				//Reset position
+				players[0].x = 3;
+				players[0].y = 5;
+
+				//Select new block randomly
+				Player_selectBlock(&players[0],blocks[rand()%blockCount]);
+			}
 		}
-		
+
 		//Render
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-		glColor3f(0.5f,0.5f,0.5f);
-		glBegin(GL_QUADS);
-			glVertex2i(16,16);
-			glVertex2i(16,32);
-			glVertex2i(32,32);
-			glVertex2i(32,16);
-		glEnd();
-
 		{
 			//Render player's selected block
 			glColor3f(1.0f,1.0f,1.0f);
-			glTranslatef(players[0].x*GAME_GRID_SIZE,players[0].y*GAME_GRID_SIZE,0.0f);
-			glBegin(GL_POINTS);
-				unsigned short w = Block_getWidth (players[0].selectedBlock.copy),
-				               y = Block_getHeight(players[0].selectedBlock.copy);
-				unsigned short x = w;
+			if(players[0].selectedBlock.copy){
+				glTranslatef(players[0].x*GAME_GRID_SIZE,players[0].y*GAME_GRID_SIZE,0.0f);
+				glBegin(GL_POINTS);
+					unsigned short w = Block_getWidth (players[0].selectedBlock.copy),
+					               y = Block_getHeight(players[0].selectedBlock.copy);
+					unsigned short x = w;
 
-				while(y-->0){
-					x = w;
-					while(x-->0)
-						if(Block_getSpace(players[0].selectedBlock.copy,x,y))
-							glVertex2i(x*GAME_GRID_SIZE,y*GAME_GRID_SIZE);
-				}
-			glEnd();
-			glTranslatef(-players[0].x*GAME_GRID_SIZE,-players[0].y*GAME_GRID_SIZE,0.0f);
+					while(y-->0){
+						x = w;
+						while(x-->0)
+							if(Block_getSpace(players[0].selectedBlock.copy,x,y))
+								glVertex2i(x*GAME_GRID_SIZE,y*GAME_GRID_SIZE);
+					}
+				glEnd();
+				glTranslatef(-players[0].x*GAME_GRID_SIZE,-players[0].y*GAME_GRID_SIZE,0.0f);
+			}
 		}
 
 		//Double buffering
