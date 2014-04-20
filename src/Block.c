@@ -14,9 +14,12 @@ struct Block* Block_alloc(unsigned short width,unsigned short height){
 }
 
 bool Block_getSpace(const struct Block* block,unsigned short x,unsigned short y){
+	//If outside of bounds
 	if(x >= block->width || y >= block->height)
+		//No space outside is solid, return false
 		return false;
 	else
+		//Check if the given coordinates of space is solid
 		return Bits_get(block->spaces,y*block->width + x);
 }
 

@@ -16,9 +16,21 @@ struct Player{
 	}selectedBlock;
 };
 
+/**
+ * Selects the player's currently holding block. This function is also used for delecting a block.
+ *
+ * @param block The block to select or replace the selection with. NULL if deselecting.
+ */
 void Player_selectBlock(struct Player* player,const struct Block* block);
 
+/**
+ * Rotates the player's currently selected block. Does nothing if the nothing is selected.
+ */
 void Player_rotateBlockLeft(struct Player* player);
+
+/**
+ * Rotates the player's currently selected block. Does nothing if the nothing is selected.
+ */
 void Player_rotateBlockRight(struct Player* player);
 
 #endif

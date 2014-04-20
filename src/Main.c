@@ -35,6 +35,7 @@ static void onResize(GLFWwindow* window,int width,int height){
 	glViewport(0,0,width,height);
 }
 
+//TODO: Rewrite input system for extensibility. Maybe using structures holding "input systems" and all players haing a pointer to the system and the data the system uses.
 static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifiers){
 	if(action == GLFW_PRESS){
 		switch(key){
@@ -68,7 +69,7 @@ static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifie
 #define WINDOW_WIDTH_INITIAL  480
 #define WINDOW_HEIGHT_INITIAL 480
 
-struct Player players[4];
+struct Player players[4];//TODO: Multiplayer using more flexible data structure
 unsigned short playerCount = 0;
 
 int main(int argc,const char* argv[]){
@@ -77,7 +78,7 @@ int main(int argc,const char* argv[]){
 	//Initiate glfw
 	glfwInit();
 
-	//Gaqme window
+	//Game window
 	if(!(gameWindow=glfwCreateWindow(WINDOW_WIDTH_INITIAL,WINDOW_HEIGHT_INITIAL,"Tetris clone",NULL,NULL))){
 		fputs("Game window creation failed",stderr);
 		glfwTerminate();
@@ -85,9 +86,11 @@ int main(int argc,const char* argv[]){
 	}
 	puts("Game window created");
 
+	//Set callbacks
 	glfwSetFramebufferSizeCallback(gameWindow,onResize);
 	glfwSetKeyCallback(gameWindow,onKey);
 
+	//Initiate rendering
 	glfwMakeContextCurrent(gameWindow);
 	glfwSwapInterval(1);
 	glInit2dSettings();
@@ -185,6 +188,7 @@ int main(int argc,const char* argv[]){
 					               y = Block_getHeight(players[0].selectedBlock.copy);
 					unsigned short x = w;
 
+					//Render each grid square based on the space data, if it is solid at that coordinate point
 					while(y-->0){
 						x = w;
 						while(x-->0)

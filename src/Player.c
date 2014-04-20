@@ -8,9 +8,10 @@
 void Player_selectBlock(struct Player* player,const struct Block* block){
 	player->selectedBlock.original = block;
 
-	if(block==NULL)
-		player->selectedBlock.copy = NULL;
-	else{
+	if(block==NULL){
+		player->selectedBlock.copy     = NULL;
+		player->selectedBlock.rotation = BLOCK_ROTATION_NONE;
+	}else{
 		size_t newSize = Bits_sizeof(block->width*block->height);
 		if(player->selectedBlock.copy==NULL || newSize > Bits_sizeof(player->selectedBlock.copy->width*player->selectedBlock.copy->height)){
 			player->selectedBlock.copy = realloc(player->selectedBlock.copy,newSize);
@@ -20,6 +21,9 @@ void Player_selectBlock(struct Player* player,const struct Block* block){
 };
 
 void Player_rotateBlockLeft(struct Player* player){
+	if(!player->selectedBlock.original)
+		return;
+
 	switch(player->selectedBlock.rotation){
 		case BLOCK_ROTATION_NONE:
 			Block_rotateLeft(player->selectedBlock.original,player->selectedBlock.copy);
@@ -41,6 +45,9 @@ void Player_rotateBlockLeft(struct Player* player){
 }
 
 void Player_rotateBlockRight(struct Player* player){
+	if(!player->selectedBlock.original)
+		return;
+	
 	switch(player->selectedBlock.rotation){
 		case BLOCK_ROTATION_NONE:
 			Block_rotateRight(player->selectedBlock.original,player->selectedBlock.copy);
