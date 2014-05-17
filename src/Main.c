@@ -4,6 +4,7 @@
 #include "Block.h"
 #include "Player.h"
 #include "Game.h"
+#include "Map.h"
 
 /**
  * Initiate states for drawing in two dimensions
@@ -100,6 +101,9 @@ int main(int argc,const char* argv[]){
 	glDisable(GL_POINT_SMOOTH);
 	glHint(GL_POINT_SMOOTH_HINT,GL_FASTEST);
 	glPointSize(GAME_GRID_SIZE);
+
+	//Initiate map
+	struct Map* Map_alloc(10, 15);
 
 	//Initiate block types
 	unsigned short blockCount = 7;
