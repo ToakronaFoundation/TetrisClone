@@ -23,6 +23,7 @@ bool Block_getSpace(const struct Block* block,unsigned short x,unsigned short y)
 		return Bits_get(block->spaces,y*block->width + x);
 }
 
+//TODO: http://en.wikipedia.org/wiki/In-place_matrix_transposition
 struct Block* Block_rotateHalfTurn(const struct Block* block,struct Block* out){
 	out->width  = block->width;
 	out->height = block->height;
