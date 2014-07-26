@@ -103,7 +103,8 @@ int main(int argc,const char* argv[]){
 	glPointSize(GAME_GRID_SIZE);
 
 	//Initiate map
-	struct Map* Map_alloc(10, 15);
+	struct Map* map;
+	map = Map_alloc(10, 15);
 
 	//Initiate block types
 	unsigned short blockCount = 7;

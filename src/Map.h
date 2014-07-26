@@ -1,9 +1,8 @@
 #ifndef __TOAKRONAF_TETRIS_MAP_H_INCLUDED__
 #define __TOAKRONAF_TETRIS_MAP_H_INCLUDED__
 
-#include "Types.h"
-#include "Block.h"
 #include <stdbool.h>
+#include "Block.h"
 
 /**
  * A map is simply a twodimensional array of booleans
@@ -13,7 +12,7 @@ struct Map {
 	unsigned int width;
 	unsigned int height;
 
-	bool collisionMap[];
+	bool* collisionMap[];
 };
 
 /**
@@ -63,3 +62,5 @@ bool Map_removeLine(struct Map* map, unsigned int y);
  */
 
 bool Map_removeLines(struct Map* map);
+
+#endif

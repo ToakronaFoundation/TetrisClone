@@ -8,6 +8,8 @@ extern inline void Block_setSpacesFromBitlist(struct Block* block,byte* bitlist,
 
 struct Block* Block_alloc(unsigned short width,unsigned short height){
 	struct Block* block = malloc(sizeof(struct Block) + Bits_sizeof(width*height));
+	if(!block)
+		return NULL;
 	block->width  = width;
 	block->height = height;
 	return block;

@@ -1,20 +1,22 @@
 #include "Map.h"
 #include "Bits.h"
 #include "Block.h"
+#include "Types.h"
 #include <stdbool.h>
 
 struct Map* Map_alloc(unsigned int width, unsigned int height){
-	struct Map* map = malloc(sizeof(struct Block) + sizeof(byte *) * height);
+	struct Map* map = malloc(sizeof(struct Map) + sizeof(bool *) * height);
+	if(!map)
+		return NULL;
 	map->width  = width;
 	map->height = height;
-	int i;
-	for(i = 0; i < height; ++i){
-		map->collisionMap[i] = calloc(width, sizeof(byte))
+	for(int i = 0; i < height; ++i){
+		map->collisionMap[i] = calloc(width, sizeof(bool));
 	}
-	return block;
+	return map;
 }
 
-bool Map_intersectsWithBlock(struct Map* map, struct Block* block, unsigned int x, unsigned int y){
+bool Map_intersectsWithBlock(struct Map* map, const struct Block* block, unsigned int x, unsigned int y){
 	//bounds check
 	if (x + block->width > map->width)
 		return false;
@@ -29,7 +31,7 @@ bool Map_intersectsWithBlock(struct Map* map, struct Block* block, unsigned int 
 	return false;
 }
 
-bool Map_imprintBlock(struct Map* map, struct Block* block, unsigned int x, unsigned int y){
+bool Map_imprintBlock(struct Map* map, const struct Block* block, unsigned int x, unsigned int y){
 	//bounds check
 	if (x + block->width > map->width || y + block->height > map->height)
 		return false;
@@ -48,15 +50,17 @@ bool Map_removeLine(struct Map* map, unsigned int y){
 	if(map->height < y){
 		return false;
 	}
-	for(int i = 0; i < map->width; ++i){
-		if (map->collisionMap[height][i]){
+	int i = 0;
+	for(; i < map->width; ++i){
+		if (map->collisionMap[y][i]){
 			return false;
 		}
 	}
 	while (i --> 0){
-		map->collisionMap[height][i] = false;
+		map->collisionMap[y][i] = false;
 	}
 	return true;
+}
 
 bool Map_removeLines(struct Map* map){
 	unsigned int height = map->height;
@@ -65,3 +69,4 @@ bool Map_removeLines(struct Map* map){
 		lineWasRemoved = lineWasRemoved || Map_removeLine(map, height);
 	}
 	return lineWasRemoved;
+}
