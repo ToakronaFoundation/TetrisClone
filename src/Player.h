@@ -3,6 +3,8 @@
 
 #include "Block.h"
 
+struct Map;
+
 struct Player{
 	unsigned short x;
 	unsigned short y;
@@ -32,5 +34,8 @@ void Player_rotateBlockLeft(struct Player* player);
  * Rotates the player's currently selected block. Does nothing if the nothing is selected.
  */
 void Player_rotateBlockRight(struct Player* player);
+
+bool Player_moveX(struct Player* player,struct Map* map,int x);
+bool Player_moveY(struct Player* player,struct Map* map,int y);
 
 #endif

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "Block.h"
 #include "Bits.h"
+#include "Map.h"
 
 void Player_selectBlock(struct Player* player,const struct Block* block){
 	player->selectedBlock.original = block;
@@ -66,4 +67,24 @@ void Player_rotateBlockRight(struct Player* player){
 			player->selectedBlock.rotation = BLOCK_ROTATION_HALFTURN;
 			break;
 	}
+}
+
+bool Player_moveX(struct Player* player,struct Map* map,int x){
+	x+=player->x;
+
+	if(x<0 || x+player->selectedBlock.copy->width > map->width)
+		return false;
+	
+	player->x = x;
+	return true;
+}
+
+bool Player_moveY(struct Player* player,struct Map* map,int y){
+	y+=player->y;
+
+	if(y<0 || y+player->selectedBlock.copy->height > map->height)
+		return false;
+
+	player->y = y;
+	return true;
 }
