@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "Types.h"
+#include "Bits.h"
 
 enum BlockRotation{
 	BLOCK_ROTATION_NONE,
@@ -106,6 +107,9 @@ struct Block* Block_invertY(const struct Block* block,struct Block* out);
  * @return      Returns whether the block is solid at the given position. Positions outside the block's bounds should return false.
  */
 bool Block_getSpace(const struct Block* block,unsigned short x,unsigned short y);
+inline bool Block__getSpace(const struct Block* block,unsigned short x,unsigned short y){
+	return Bits_get(block->spaces,y*block->width + x);	
+}
 
 /**
  * Sets the space state, if it is solid at the given position.

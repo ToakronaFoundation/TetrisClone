@@ -4,6 +4,8 @@
 #include "Types.h"
 #include <stdbool.h>
 
+extern inline bool Map__getSpace(const struct Map* map,unsigned int x,unsigned int y);
+extern inline void Map__setSpace(const struct Map* map,unsigned int x,unsigned int y,bool state);
 extern inline bool Map_getSpace(const struct Map* map,unsigned int x,unsigned int y);
 extern inline bool Map_setSpace(const struct Map* map,unsigned int x,unsigned int y,bool state);
 
@@ -40,8 +42,8 @@ bool Map_imprintBlock(struct Map* map, const struct Block* block, unsigned int x
 		return false;
 	for(unsigned int iy = 0; iy < block->height; ++iy){
 		for(unsigned int ix = 0; ix < block->width ; ++ix){
-			if(Block_getSpace(block,ix,iy)){
-				Map_setSpace(map,x+ix,y+iy,true);
+			if(Block__getSpace(block,ix,iy)){
+				Map__setSpace(map,x+ix,y+iy,true);
 			}
 		}
 	}

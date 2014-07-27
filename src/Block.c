@@ -2,6 +2,7 @@
 
 #include "Bits.h"
 
+extern inline bool Block__getSpace(const struct Block* block,unsigned short x,unsigned short y);
 extern inline unsigned short Block_getWidth(const struct Block* block);
 extern inline unsigned short Block_getHeight(const struct Block* block);
 extern inline void Block_setSpacesFromBitlist(struct Block* block,byte* bitlist,size_t size);
@@ -22,7 +23,7 @@ bool Block_getSpace(const struct Block* block,unsigned short x,unsigned short y)
 		return false;
 	else
 		//Check if the given coordinates of space is solid
-		return Bits_get(block->spaces,y*block->width + x);
+		return Block__getSpace(block,x,y);
 }
 
 struct Block* Block_rotateHalfTurn(const struct Block* block,struct Block* out){

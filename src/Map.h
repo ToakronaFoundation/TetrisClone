@@ -63,10 +63,18 @@ bool Map_removeLine(struct Map* map, unsigned int y);
 
 bool Map_removeLines(struct Map* map);
 
+inline bool Map__getSpace(const struct Map* map,unsigned int x,unsigned int y){
+	return map->collisionMap[y][x];
+}
+
 inline bool Map_getSpace(const struct Map* map,unsigned int x,unsigned int y){
 	if(x<0 || x>=map->width || y<0 || y>=map->height)
 		return false;
-	return map->collisionMap[y][x];
+	return Map__getSpace(map,x,y);
+}
+
+inline void Map__setSpace(const struct Map* map,unsigned int x,unsigned int y,bool state){
+	map->collisionMap[y][x] = state;
 }
 
 inline bool Map_setSpace(const struct Map* map,unsigned int x,unsigned int y,bool state){
