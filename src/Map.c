@@ -36,12 +36,12 @@ bool Map_intersectsWithBlock(struct Map* map, const struct Block* block, unsigne
 
 bool Map_imprintBlock(struct Map* map, const struct Block* block, unsigned int x, unsigned int y){
 	//bounds check
-	if(x+block->width > map->width || y-block->height > map->height)
+	if(x+block->width > map->width || y+block->height > map->height)
 		return false;
 	for(unsigned int iy = 0; iy < block->height; ++iy){
 		for(unsigned int ix = 0; ix < block->width ; ++ix){
 			if(Block_getSpace(block,ix,iy)){
-				Map_setSpace(map,x+ix,y-iy,true);
+				Map_setSpace(map,x+ix,y+iy,true);
 			}
 		}
 	}

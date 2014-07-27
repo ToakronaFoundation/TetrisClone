@@ -24,6 +24,8 @@ void Game_blockTouchesBottom(struct Player* player,struct Map* map,struct Block*
 
 	//Select new block randomly
 	Player_selectBlock(player,blocks[rand()%blockCount]);
+
+	player->fallTimeCounter=0;
 }
 
 /**
