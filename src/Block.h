@@ -25,6 +25,10 @@ struct Block{
 
 //TODO: Should the transformation functions also return a offset the block should move after being transformed?
 
+inline size_t Block_sizeof(const struct Block* block){
+	return sizeof(struct Block) + Bits_sizeof(block->width*block->height);
+}
+
 /**
  * Allocates a block with the given size
  *

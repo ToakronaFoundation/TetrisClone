@@ -10,6 +10,7 @@ struct Player{
 	unsigned short y;
 
 	unsigned short fallTimeCounter;
+	short downKeyCounter;
 
 	struct{
 		const struct Block* original;
@@ -28,14 +29,14 @@ void Player_selectBlock(struct Player* player,const struct Block* block);
 /**
  * Rotates the player's currently selected block. Does nothing if the nothing is selected.
  */
-void Player_rotateBlockLeft(struct Player* player);
+bool Player_rotateBlockLeft(struct Player* player,const struct Map* map);
 
 /**
  * Rotates the player's currently selected block. Does nothing if the nothing is selected.
  */
-void Player_rotateBlockRight(struct Player* player);
+bool Player_rotateBlockRight(struct Player* player,const struct Map* map);
 
-bool Player_moveX(struct Player* player,struct Map* map,int x);
-bool Player_moveY(struct Player* player,struct Map* map,int y);
+bool Player_moveX(struct Player* player,const struct Map* map,int x);
+bool Player_moveY(struct Player* player,const struct Map* map,int y);
 
 #endif

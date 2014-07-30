@@ -2,6 +2,7 @@
 
 #include "Bits.h"
 
+extern inline size_t Block_sizeof(const struct Block* block);
 extern inline bool Block__getSpace(const struct Block* block,unsigned short x,unsigned short y);
 extern inline unsigned short Block_getWidth(const struct Block* block);
 extern inline unsigned short Block_getHeight(const struct Block* block);

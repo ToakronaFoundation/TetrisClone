@@ -21,9 +21,14 @@ void Player_selectBlock(struct Player* player,const struct Block* block){
 	}
 };
 
-void Player_rotateBlockLeft(struct Player* player){
+bool Player_rotateBlockLeft(struct Player* player,const struct Map* map){
 	if(!player->selectedBlock.original)
-		return;
+		return false;
+
+	const size_t size = Block_sizeof(player->selectedBlock.copy);
+	byte copy[size];
+	memcpy(&copy,player->selectedBlock.copy,size);
+	const enum BlockRotation rotation = player->selectedBlock.rotation;
 
 	switch(player->selectedBlock.rotation){
 		case BLOCK_ROTATION_NONE:
@@ -43,12 +48,26 @@ void Player_rotateBlockLeft(struct Player* player){
 			player->selectedBlock.rotation = BLOCK_ROTATION_NONE;
 			break;
 	}
+
+	//If out of bounds or intersects, revert changes
+	if(player->x+player->selectedBlock.copy->width > map->width || player->y+player->selectedBlock.copy->height > map->height || Map_intersectsWithBlock(map,player->selectedBlock.copy,player->x,player->y)){
+		memcpy(player->selectedBlock.copy,&copy,size);
+		player->selectedBlock.rotation = rotation;
+		return false;
+	}
+
+	return true;
 }
 
-void Player_rotateBlockRight(struct Player* player){
+bool Player_rotateBlockRight(struct Player* player,const struct Map* map){
 	if(!player->selectedBlock.original)
-		return;
-	
+		return false;
+
+	const size_t size = Block_sizeof(player->selectedBlock.copy);
+	byte copy[size];
+	memcpy(&copy,player->selectedBlock.copy,size);
+	const enum BlockRotation rotation = player->selectedBlock.rotation;
+
 	switch(player->selectedBlock.rotation){
 		case BLOCK_ROTATION_NONE:
 			Block_rotateRight(player->selectedBlock.original,player->selectedBlock.copy);
@@ -67,9 +86,18 @@ void Player_rotateBlockRight(struct Player* player){
 			player->selectedBlock.rotation = BLOCK_ROTATION_HALFTURN;
 			break;
 	}
+
+	//If out of bounds or intersects, revert changes
+	if(player->x+player->selectedBlock.copy->width > map->width || player->y+player->selectedBlock.copy->height > map->height || Map_intersectsWithBlock(map,player->selectedBlock.copy,player->x,player->y)){
+		memcpy(player->selectedBlock.copy,&copy,size);
+		player->selectedBlock.rotation = rotation;
+		return false;
+	}
+
+	return true;
 }
 
-bool Player_moveX(struct Player* player,struct Map* map,int x){
+bool Player_moveX(struct Player* player,const struct Map* map,int x){
 	//New x
 	x+=player->x;
 
@@ -86,7 +114,7 @@ bool Player_moveX(struct Player* player,struct Map* map,int x){
 	return true;
 }
 
-bool Player_moveY(struct Player* player,struct Map* map,int y){
+bool Player_moveY(struct Player* player,const struct Map* map,int y){
 	//New y
 	y+=player->y;
 

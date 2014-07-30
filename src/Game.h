@@ -3,4 +3,11 @@
 
 #define GAME_GRID_SIZE 16
 
+#define GAME_INITIAL_WIDTH  10
+#define GAME_INITIAL_HEIGHT 20
+
+//TODO: These should be a in-game settings
+#define GAME_DOWNKEY_TIME 15
+#define GAME_DOWNKEY_SPEED 1
+
 #endif

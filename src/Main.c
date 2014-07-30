@@ -22,10 +22,15 @@ void Game_blockTouchesBottom(struct Player* player,struct Map* map,struct Block*
 	player->x = 3;
 	player->y = 0;
 
+	//Reset rotation
+	player->selectedBlock.rotation = BLOCK_ROTATION_NONE;
+
 	//Select new block randomly
 	Player_selectBlock(player,blocks[rand()%blockCount]);
 
 	player->fallTimeCounter=0;
+
+	Map_removeLines(map);//TODO: Not working at the moment and may be more efficient to just check for the rows that the current block affected
 }
 
 /**
@@ -60,28 +65,31 @@ static void onResize(GLFWwindow* window,int width,int height){
 
 //TODO: Rewrite input system for extensibility. Maybe using structures holding "input systems" and all players haing a pointer to the system and the data the system uses.
 static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifiers){
+	struct GameData*const gameData = glfwGetWindowUserPointer(window);
 	if(action == GLFW_PRESS){
-		struct GameData*const gameData = glfwGetWindowUserPointer(window);
 		switch(key){
 			case GLFW_KEY_ESCAPE:
 				glfwSetWindowShouldClose(window,true);
 				break;
-			case GLFW_KEY_X:{
-				Player_rotateBlockLeft(&gameData->players[0]);
-			}	break;
-			case GLFW_KEY_C:{
-				Player_rotateBlockRight(&gameData->players[0]);
-			}	break;
-			case GLFW_KEY_LEFT:{
+			case GLFW_KEY_X:
+				Player_rotateBlockLeft(&gameData->players[0],gameData->map);
+				break;
+			case GLFW_KEY_C:
+				Player_rotateBlockRight(&gameData->players[0],gameData->map);
+				break;
+			case GLFW_KEY_LEFT:
 				Player_moveX(&gameData->players[0],gameData->map,-1);
-			}	break;
-			case GLFW_KEY_RIGHT:{
+				break;
+			case GLFW_KEY_RIGHT:
 				Player_moveX(&gameData->players[0],gameData->map,1);
-			}	break;
-			case GLFW_KEY_DOWN:{
+				break;
+			case GLFW_KEY_DOWN:
+				gameData->players[0].downKeyCounter = -GAME_DOWNKEY_TIME;
+				gameData->players[0].fallTimeCounter = 0;
+
 				if(!Player_moveY(&gameData->players[0],gameData->map,1))
 					Game_blockTouchesBottom(&gameData->players[0],gameData->map,gameData->blocks,gameData->blockCount);
-			}	break;
+				break;
 		}
 	}
 }
@@ -121,8 +129,8 @@ int main(int argc,const char* argv[]){
 	glPointSize(GAME_GRID_SIZE);
 
 	//Initiate gameData.map
-	if(!(gameData.map = Map_alloc(10, 15))){
-		fprintf(stderr,"Error: Cannot allocate gameData.map with the size %ux%u\n",10,15);
+	if(!(gameData.map = Map_alloc(GAME_INITIAL_WIDTH,GAME_INITIAL_HEIGHT))){
+		fprintf(stderr,"Error: Cannot allocate gameData.map with the size %ux%u\n",GAME_INITIAL_WIDTH,GAME_INITIAL_HEIGHT);
 		return 1;
 	}
 
@@ -173,6 +181,7 @@ int main(int argc,const char* argv[]){
 		.x = 3,
 		.y = 0,
 		.fallTimeCounter = 0,
+		.downKeyCounter = 0,
 		.selectedBlock = {NULL,NULL,BLOCK_ROTATION_NONE}
 	};
 	gameData.playerCount = 1;
@@ -183,17 +192,29 @@ int main(int argc,const char* argv[]){
 		//Events (Input, window, ...)
 		glfwPollEvents();
 
+		//Continuous key down //TODO: Acceleration like Tengen Tetris, continuous left and right keys
+		if(glfwGetKey(gameWindow,GLFW_KEY_DOWN)){
+			if(gameData.players[0].downKeyCounter > GAME_DOWNKEY_SPEED){
+				gameData.players[0].downKeyCounter = 0;
+
+				if(!Player_moveY(&gameData.players[0],gameData.map,1)){
+					Game_blockTouchesBottom(&gameData.players[0],gameData.map,gameData.blocks,gameData.blockCount);
+					gameData.players[0].fallTimeCounter = 0;
+				}
+			}else
+				++gameData.players[0].downKeyCounter;
+		}
+
 		//Update
 		++gameData.players[0].fallTimeCounter;
 		if(gameData.players[0].fallTimeCounter>60){//TODO: 1 block per 60 frames is the fallspeed at the moment. Organize code and change to more customizable
-			if(!Player_moveY(&gameData.players[0],gameData.map,1))
+			if(!glfwGetKey(gameWindow,GLFW_KEY_DOWN) && !Player_moveY(&gameData.players[0],gameData.map,1))
 				Game_blockTouchesBottom(&gameData.players[0],gameData.map,gameData.blocks,gameData.blockCount);
 			gameData.players[0].fallTimeCounter=0;
 		}
 
 		//Render
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		glColor3f(0.5f,0.5f,0.5f);
 		Map_draw(gameData.map,0,0);
 		glColor3f(1.0f,1.0f,1.0f);
 		Block_draw(gameData.players[0].selectedBlock.copy,gameData.players[0].x,gameData.players[0].y);

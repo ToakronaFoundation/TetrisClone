@@ -21,7 +21,7 @@ struct Map* Map_alloc(unsigned int width, unsigned int height){
 	return map;
 }
 
-bool Map_intersectsWithBlock(struct Map* map, const struct Block* block, unsigned int x, unsigned int y){
+bool Map_intersectsWithBlock(const struct Map* map, const struct Block* block, unsigned int x, unsigned int y){
 	//bounds check
 	if (x+block->width > map->width || y+block->height > map->height)
 		return false;

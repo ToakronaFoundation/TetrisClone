@@ -33,7 +33,7 @@ struct Map* Map_alloc(unsigned int width, unsigned int height);
  * @return		Whether it intersects or not
  */
 
-bool Map_intersectsWithBlock(struct Map* map, const struct Block* block, unsigned int x, unsigned int y);
+bool Map_intersectsWithBlock(const struct Map* map, const struct Block* block, unsigned int x, unsigned int y);
 
 /**
  * Superimmposes a block on a map, making coordinates of the map solid where the block with position x and y would be solid.
