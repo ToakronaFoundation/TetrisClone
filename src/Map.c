@@ -23,12 +23,11 @@ struct Map* Map_alloc(unsigned int width, unsigned int height){
 
 bool Map_intersectsWithBlock(struct Map* map, const struct Block* block, unsigned int x, unsigned int y){
 	//bounds check
-	if (x + block->width > map->width)
+	if (x+block->width > map->width || y+block->height > map->height)
 		return false;
-	int i,j;
-	for     (i = y; i < block->height + y; ++i){
-		for (j = x; j < block->width  + x; ++j){
-			if (map->height <= y ||  (Map_getSpace(map,j,i) && Block_getSpace(block, x + j, y + i)))
+	for     (unsigned int iy = 0; iy < block->height; ++iy){
+		for (unsigned int ix = 0; ix < block->width ; ++ix){
+			if(Block__getSpace(block,ix,iy) && Map__getSpace(map,x+ix,y+iy))
 				return true;
 		}
 	}
@@ -40,7 +39,7 @@ bool Map_imprintBlock(struct Map* map, const struct Block* block, unsigned int x
 	//bounds check
 	if(x+block->width > map->width || y+block->height > map->height)
 		return false;
-	for(unsigned int iy = 0; iy < block->height; ++iy){
+	for    (unsigned int iy = 0; iy < block->height; ++iy){
 		for(unsigned int ix = 0; ix < block->width ; ++ix){
 			if(Block__getSpace(block,ix,iy)){
 				Map__setSpace(map,x+ix,y+iy,true);
@@ -55,14 +54,14 @@ bool Map_removeLine(struct Map* map, unsigned int y){
 	if(map->height < y){
 		return false;
 	}
-	int i = 0;
-	for(; i < map->width; ++i){
-		if (Map_getSpace(map,i,y)){
+	int i;
+	for(i=0; i < map->width; ++i){
+		if (Map__getSpace(map,i,y)){
 			return false;
 		}
 	}
 	while (i --> 0){
-		Map_setSpace(map,i,y,false);
+		Map__setSpace(map,i,y,false);
 	}
 	return true;
 }

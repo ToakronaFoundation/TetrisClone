@@ -70,21 +70,35 @@ void Player_rotateBlockRight(struct Player* player){
 }
 
 bool Player_moveX(struct Player* player,struct Map* map,int x){
+	//New x
 	x+=player->x;
 
+	//If out of bounds
 	if(x<0 || x+player->selectedBlock.copy->width > map->width)
 		return false;
+
+	//If intersects
+	if(Map_intersectsWithBlock(map,player->selectedBlock.copy,x,player->y))
+		return false;
 	
+	//Move
 	player->x = x;
 	return true;
 }
 
 bool Player_moveY(struct Player* player,struct Map* map,int y){
+	//New y
 	y+=player->y;
 
+	//If out of bounds
 	if(y<0 || y+player->selectedBlock.copy->height > map->height)
 		return false;
 
+	//If intersects
+	if(Map_intersectsWithBlock(map,player->selectedBlock.copy,player->x,y))
+		return false;
+
+	//Move
 	player->y = y;
 	return true;
 }
