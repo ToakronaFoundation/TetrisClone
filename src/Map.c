@@ -56,7 +56,7 @@ bool Map_removeLine(struct Map* map, unsigned int y){
 	}
 	int i;
 	for(i=0; i < map->width; ++i){
-		if (Map__getSpace(map,i,y)){
+		if (!Map__getSpace(map,i,y)){
 			return false;
 		}
 	}
@@ -70,7 +70,7 @@ bool Map_removeLines(struct Map* map){
 	unsigned int height = map->height;
 	bool lineWasRemoved = false;
 	while (height --> 0){
-		lineWasRemoved = lineWasRemoved || Map_removeLine(map, height);
+		lineWasRemoved = Map_removeLine(map, height) || lineWasRemoved;
 	}
 	return lineWasRemoved;
 }
