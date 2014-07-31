@@ -147,6 +147,4 @@ inline unsigned short Block_getHeight(const struct Block* block){
 	return block->height;
 }
 
-void Block_render(const struct Block* block);
-
 #endif

@@ -9,7 +9,7 @@ struct Player{
 	unsigned short x;
 	unsigned short y;
 
-	unsigned short fallTimeCounter;
+	unsigned short fallTimeCounter;//TODO: Make an abstract controller, in this case both a HumanControl and a FallTimeControl
 	short downKeyCounter;
 
 	struct{
@@ -36,7 +36,14 @@ bool Player_rotateBlockLeft(struct Player* player,const struct Map* map);
  */
 bool Player_rotateBlockRight(struct Player* player,const struct Map* map);
 
+/**
+ * Moves player horizontally (x-axis)
+ */
 bool Player_moveX(struct Player* player,const struct Map* map,int x);
+
+/**
+ * Moves player vertically (y-axis)
+ */
 bool Player_moveY(struct Player* player,const struct Map* map,int y);
 
 #endif

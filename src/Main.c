@@ -2,36 +2,10 @@
 #include <stdio.h>
 #include <GLFW/glfw3.h>
 #include "Block.h"
+#include "BlockTypeData.h"
 #include "Player.h"
 #include "Game.h"
 #include "Map.h"
-#include "draw.h"
-
-struct GameData{
-	struct Player players[4];//TODO: Multiplayer using more flexible data structure
-	unsigned short playerCount;
-	struct Map* map;
-	unsigned short blockCount;
-	struct Block** blocks;
-};
-
-void Game_blockTouchesBottom(struct Player* player,struct Map* map,struct Block** blocks,unsigned int blockCount){
-	Map_imprintBlock(map,player->selectedBlock.copy,player->x,player->y);
-
-	//Reset position
-	player->x = 3;
-	player->y = 0;
-
-	//Reset rotation
-	player->selectedBlock.rotation = BLOCK_ROTATION_NONE;
-
-	//Select new block randomly
-	Player_selectBlock(player,blocks[rand()%blockCount]);
-
-	player->fallTimeCounter=0;
-
-	Map_removeLines(map);//TODO: Not working at the moment and may be more efficient to just check for the rows that the current block affected
-}
 
 /**
  * Initiate states for drawing in two dimensions
@@ -63,7 +37,7 @@ static void onResize(GLFWwindow* window,int width,int height){
 	glViewport(0,0,width,height);
 }
 
-//TODO: Rewrite input system for extensibility. Maybe using structures holding "input systems" and all players haing a pointer to the system and the data the system uses.
+//TODO: Rewrite input system for extensibility. Maybe using structures holding "input systems" and all players having a pointer to the system and the data the system uses.
 static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifiers){
 	struct GameData*const gameData = glfwGetWindowUserPointer(window);
 	if(action == GLFW_PRESS){
@@ -88,7 +62,7 @@ static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifie
 				gameData->players[0].fallTimeCounter = 0;
 
 				if(!Player_moveY(&gameData->players[0],gameData->map,1))
-					Game_blockTouchesBottom(&gameData->players[0],gameData->map,gameData->blocks,gameData->blockCount);
+					Game_blockTouchesBottom(&gameData->players[0],gameData->map,gameData->blockTypes);
 				break;
 		}
 	}
@@ -98,7 +72,6 @@ static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifie
 #define WINDOW_HEIGHT_INITIAL 480
 
 int main(int argc,const char* argv[]){
-	struct GameData gameData = {.playerCount = 0};
 	GLFWwindow* gameWindow;
 
 	//Initiate glfw
@@ -111,7 +84,6 @@ int main(int argc,const char* argv[]){
 		return EXIT_FAILURE;
 	}
 	puts("Game window created");
-	glfwSetWindowUserPointer(gameWindow,&gameData);//TODO: Temporary code for testing. Also change the onKey function after changing this (the glfwGetWindowUserPointer(window) calls)
 
 	//Set callbacks
 	glfwSetFramebufferSizeCallback(gameWindow,onResize);
@@ -128,6 +100,9 @@ int main(int argc,const char* argv[]){
 	glHint(GL_POINT_SMOOTH_HINT,GL_FASTEST);
 	glPointSize(GAME_GRID_SIZE);
 
+	struct GameData gameData = {.playerCount = 0};
+	glfwSetWindowUserPointer(gameWindow,&gameData);
+
 	//Initiate gameData.map
 	if(!(gameData.map = Map_alloc(GAME_INITIAL_WIDTH,GAME_INITIAL_HEIGHT))){
 		fprintf(stderr,"Error: Cannot allocate gameData.map with the size %ux%u\n",GAME_INITIAL_WIDTH,GAME_INITIAL_HEIGHT);
@@ -135,47 +110,51 @@ int main(int argc,const char* argv[]){
 	}
 
 	//Initiate block types
-	gameData.blockCount = 7;
-	gameData.blocks = malloc(sizeof(struct Block*)*gameData.blockCount);
+	struct BlockTypeData* blockTypes;
+	if(!(blockTypes = BlockTypeData_alloc(7))){
+		fprintf(stderr,"Error: Cannot allocate %u block types\n",7);
+		return 1;
+	}
 	{
 		byte spaceBuffer;
 
 		//J
-		gameData.blocks[0] = Block_alloc(3,2);
+		blockTypes->blocks[0] = Block_alloc(3,2);
 		spaceBuffer = 0b100111;
-		Block_setSpacesFromBitlist(gameData.blocks[0],&spaceBuffer,1);
+		Block_setSpacesFromBitlist(blockTypes->blocks[0],&spaceBuffer,1);
 
 		//T
-		gameData.blocks[1] = Block_alloc(3,2);
+		blockTypes->blocks[1] = Block_alloc(3,2);
 		spaceBuffer = 0b010111;
-		Block_setSpacesFromBitlist(gameData.blocks[1],&spaceBuffer,1);
+		Block_setSpacesFromBitlist(blockTypes->blocks[1],&spaceBuffer,1);
 
 		//L
-		gameData.blocks[2] = Block_alloc(3,2);
+		blockTypes->blocks[2] = Block_alloc(3,2);
 		spaceBuffer = 0b001111;
-		Block_setSpacesFromBitlist(gameData.blocks[2],&spaceBuffer,1);
+		Block_setSpacesFromBitlist(blockTypes->blocks[2],&spaceBuffer,1);
 
 		//O
-		gameData.blocks[3] = Block_alloc(4,1);
+		blockTypes->blocks[3] = Block_alloc(4,1);
 		spaceBuffer = 0b1111;
-		Block_setSpacesFromBitlist(gameData.blocks[3],&spaceBuffer,1);
+		Block_setSpacesFromBitlist(blockTypes->blocks[3],&spaceBuffer,1);
 
 		//I
-		gameData.blocks[4] = Block_alloc(2,2);
+		blockTypes->blocks[4] = Block_alloc(2,2);
 		spaceBuffer = 0b1111;
-		Block_setSpacesFromBitlist(gameData.blocks[4],&spaceBuffer,1);
+		Block_setSpacesFromBitlist(blockTypes->blocks[4],&spaceBuffer,1);
 
 		//S
-		gameData.blocks[5] = Block_alloc(3,2);
+		blockTypes->blocks[5] = Block_alloc(3,2);
 		spaceBuffer = 0b011110;
-		Block_setSpacesFromBitlist(gameData.blocks[5],&spaceBuffer,1);
+		Block_setSpacesFromBitlist(blockTypes->blocks[5],&spaceBuffer,1);
 
 		//Z
-		gameData.blocks[6] = Block_alloc(3,2);
+		blockTypes->blocks[6] = Block_alloc(3,2);
 		spaceBuffer = 0b110011;
-		Block_setSpacesFromBitlist(gameData.blocks[6],&spaceBuffer,1);
+		Block_setSpacesFromBitlist(blockTypes->blocks[6],&spaceBuffer,1);
 	}
-	
+	gameData.blockTypes = blockTypes;
+
 	//Initiate players
 	gameData.players[0] = (struct Player){
 		.x = 3,
@@ -185,7 +164,7 @@ int main(int argc,const char* argv[]){
 		.selectedBlock = {NULL,NULL,BLOCK_ROTATION_NONE}
 	};
 	gameData.playerCount = 1;
-	Player_selectBlock(&gameData.players[0],gameData.blocks[0]);
+	Player_selectBlock(&gameData.players[0],gameData.blockTypes->blocks[0]);
 
 	//Game Loop
 	while(!glfwWindowShouldClose(gameWindow)){
@@ -194,30 +173,22 @@ int main(int argc,const char* argv[]){
 
 		//Continuous key down //TODO: Acceleration like Tengen Tetris, continuous left and right keys
 		if(glfwGetKey(gameWindow,GLFW_KEY_DOWN)){
-			if(gameData.players[0].downKeyCounter > GAME_DOWNKEY_SPEED){
+			if(++gameData.players[0].downKeyCounter > GAME_DOWNKEY_SPEED){
 				gameData.players[0].downKeyCounter = 0;
 
+				//If not able to move down
 				if(!Player_moveY(&gameData.players[0],gameData.map,1)){
-					Game_blockTouchesBottom(&gameData.players[0],gameData.map,gameData.blocks,gameData.blockCount);
+					Game_blockTouchesBottom(&gameData.players[0],gameData.map,gameData.blockTypes);
 					gameData.players[0].fallTimeCounter = 0;
 				}
-			}else
-				++gameData.players[0].downKeyCounter;
+			}
 		}
 
 		//Update
-		++gameData.players[0].fallTimeCounter;
-		if(gameData.players[0].fallTimeCounter>60){//TODO: 1 block per 60 frames is the fallspeed at the moment. Organize code and change to more customizable
-			if(!glfwGetKey(gameWindow,GLFW_KEY_DOWN) && !Player_moveY(&gameData.players[0],gameData.map,1))
-				Game_blockTouchesBottom(&gameData.players[0],gameData.map,gameData.blocks,gameData.blockCount);
-			gameData.players[0].fallTimeCounter=0;
-		}
+		Game_update(&gameData,gameWindow);
 
 		//Render
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		Map_draw(gameData.map,0,0);
-		glColor3f(1.0f,1.0f,1.0f);
-		Block_draw(gameData.players[0].selectedBlock.copy,gameData.players[0].x,gameData.players[0].y);
+		Game_render(&gameData);
 
 		//Double buffering
 		glfwSwapBuffers(gameWindow);
