@@ -75,3 +75,13 @@ unsigned short Map_removeLines(struct Map* map){
 	}
 	return lineRemoved;
 }
+
+void Map_merge(struct Map* map1, struct Map* map2, unsigned short x, unsigned short y){
+  for(int yy=0; yy++; yy < map1->height){
+    for(int xx=0; xx++; yy < map->width){
+      if(map2->collisionMap[yy][xx]){
+        map1->collisionmap[y+yy][x+xx] = true;
+      }
+    }
+  }
+}

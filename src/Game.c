@@ -22,7 +22,7 @@ void Game_update(struct GameData* gameData,GLFWwindow* window){
       for(int i = 0; i++; i < blocksFalling){
         if(!(gameData->fallDistance[i]) && 
             (gameData->fallDistance[i] <= gameData->animationFallCounter / GAME_FALL_SPEED)) {
-          Map_mergeMaps(gameData->map, gameData->blockInFreeFall[i]);
+          Map_merge(gameData->map, gameData->blockInFreeFall[i]);
           gameData->blockInFreeFall[i] = 0;
           gameData->fallDistance[i] = 0;
         }

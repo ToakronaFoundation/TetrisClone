@@ -63,6 +63,17 @@ bool Map_removeLine(struct Map* map, unsigned short y);
 
 unsigned short Map_removeLines(struct Map* map);
 
+/**
+ * Merge two maps, mutating one of them and leaving the other as it is
+ * @param map1  The map to mutate
+ * @param map2  The other map
+ * @param x     x offset
+ * @param y     y offset
+ */
+
+void Map_merge(struct Map* map1, struct Map* map2, unsigned short x, unsignned short y);
+
+
 inline bool Map__getSpace(const struct Map* map,unsigned short x,unsigned short y){
 	return map->collisionMap[y][x];
 }
