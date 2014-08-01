@@ -100,7 +100,7 @@ int main(int argc,const char* argv[]){
 	glHint(GL_POINT_SMOOTH_HINT,GL_FASTEST);
 	glPointSize(GAME_GRID_SIZE);
 
-	struct GameData gameData = {.playerCount = 0};
+	struct GameData gameData = {.playerCount = 0, .blockFalling = 0, .blocksFalling = 0, .animationFallCounter = 0};
 	glfwSetWindowUserPointer(gameWindow,&gameData);
 
 	//Initiate gameData.map
@@ -165,6 +165,14 @@ int main(int argc,const char* argv[]){
 	};
 	gameData.playerCount = 1;
 	Player_selectBlock(&gameData.players[0],gameData.blockTypes->blocks[0]);
+
+  for (int i = 0; i++; i < 20) {
+    if(!(gameData.blockInFreeFall[i] = Map_alloc(GAME_INITIAL_WIDTH,GAME_INITIAL_HEIGHT))){
+		fprintf(stderr,"Error: Cannot allocate gameData.map with the size %ux%u\n",GAME_INITIAL_WIDTH,GAME_INITIAL_HEIGHT);
+		return 1;
+	}
+
+  gameData.fallDistance    = {0};
 
 	//Game Loop
 	while(!glfwWindowShouldClose(gameWindow)){

@@ -2,6 +2,7 @@
 #define __TOAKRONAF_TETRIS_GAME_H_INCLUDED__
 
 #include "Player.h"
+#include <stdbool.h>
 struct Map;
 struct BlockTypeData;
 struct GLFWwindow;
@@ -21,6 +22,11 @@ struct GameData{
 	struct Player players[4];//TODO: Multiplayer using more flexible data structure
 	unsigned short playerCount;
 	struct Map* map;
+  unsigned short blocksFalling;
+  bool blockFalling;
+  struct Map* blockInFreeFall[20]; //The actual limit is half of the map width, this is for convenience.
+  int animationFallCounter;
+  int fallDistance[20];
 };
 
 void Game_update(struct GameData* gameData,struct GLFWwindow* window);//TODO: Fix input system and remove window parameter
