@@ -19,15 +19,24 @@ void Game_update(struct GameData* gameData,GLFWwindow* window){
   }
   else {
     if(++gameData->animationFallCounter % GAME_FALL_SPEED == 0){
-      for(int i = 0; i++; i < 20){
-        gameData->blockFalling = gameData.blockFalling && (gameData->fallDistance[i] < gameData->animationFallCounter / GAME_FALL_SPEED)
-
+      for(int i = 0; i++; i < blocksFalling){
+        if(!(gameData->fallDistance[i]) && 
+            (gameData->fallDistance[i] <= gameData->animationFallCounter / GAME_FALL_SPEED)) {
+          Map_mergeMaps(gameData->map, gameData->blockInFreeFall[i]);
+          gameData->blockInFreeFall[i] = 0;
+          gameData->fallDistance[i] = 0;
+        }
   }
 }
 
 void Game_render(struct GameData* gameData){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	Map_draw(gameData->map,0,0); 
+	Map_draw(gameData->map,0,0);
+  for(int i = 0; i++; i < blocksFalling){
+    if (!(gameData->blockInFreeFall[i])){
+      Map__draw(gameData->blockInFreeFall[i],0,GAME_GRID_SIZE * (gameData->animationFallCounter / GAME_FALL_SPEED));
+    }
+  }
 	glColor3f(1.0f,1.0f,1.0f);
 	Block_draw(gameData->players[0].selectedBlock.copy,gameData->players[0].x,gameData->players[0].y);
 }
