@@ -66,21 +66,23 @@ bool Map_removeLine(struct Map* map, unsigned short y){
 	return true;
 }
 
-unsigned short Map_removeLines(struct Map* map){
-	unsigned short lineRemoved = 0;
-	for(unsigned int height = 0; height++; height < map->height){
+void Map_removeLines(struct Map* map, short* topLine, unsigned short* linesRemoved){
+  *topLine = -1;
+  unsigned short height = map->height;
+	while(height --> 0){
     //If we remove a higher line number, replace the result with that linenumber
-    unsigned short isRemoved = Map_removeLine(map, height);
-		lineRemoved = isRemoved ? isRemoved : lineRemoved;
-	}
-	return lineRemoved;
+    if (Map_removeLine(map, height)){
+      *topLine = height;
+      *linesRemoved++;
+    }
+  }
 }
 
 void Map_merge(struct Map* map1, struct Map* map2, unsigned short x, unsigned short y){
-  for(int yy=0; yy++; yy < map1->height){
-    for(int xx=0; xx++; yy < map->width){
+  for(  int yy=0; yy < map2->height; ++yy){
+    for(int xx=0; xx < map2->width;  ++xx){
       if(map2->collisionMap[yy][xx]){
-        map1->collisionmap[y+yy][x+xx] = true;
+        map1->collisionMap[y+yy][x+xx] = true;
       }
     }
   }

@@ -57,21 +57,23 @@ bool Map_removeLine(struct Map* map, unsigned short y);
 
 /**
  * Removes all lines that are fully solid.
- * @param map	The map to remove lines from
- * @return		The highest line number which was removed (0 for no line removed)
+ * @param map	          The map to remove lines from
+ * @param topLine       pointer to mutate with the top line number removed by the function
+ * @param linesRemoved  pointer to mutate with the number of lines removed by the function
+ * @return		          void
  */
 
-unsigned short Map_removeLines(struct Map* map);
+void Map_removeLines(struct Map* map, short* topLine, unsigned short* linesRemoved);
 
 /**
  * Merge two maps, mutating one of them and leaving the other as it is
  * @param map1  The map to mutate
  * @param map2  The other map
  * @param x     x offset
- * @param y     y offset
+ * @param y     y offsethttp://en.wikipedia.org/wiki/The_Fragile_%28Nine_Inch_Nails_album%29
  */
 
-void Map_merge(struct Map* map1, struct Map* map2, unsigned short x, unsignned short y);
+void Map_merge(struct Map* map1, struct Map* map2, unsigned short x, unsigned short y);
 
 
 inline bool Map__getSpace(const struct Map* map,unsigned short x,unsigned short y){
