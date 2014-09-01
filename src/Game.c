@@ -39,20 +39,20 @@ void Game_render(struct GameData* gameData){
 }
 
 void Game_blockTouchesBottom(struct GameData* gameData, unsigned short playerIndex, struct Map* map, const struct BlockTypeData* blockTypes){
-  struct Player player = gameData->players[playerIndex];
-	Map_imprintBlock(map,player.selectedBlock.copy,player.x,player.y);
+  struct Player* player = gameData->players + playerIndex;
+	Map_imprintBlock(map,player->selectedBlock.copy,player->x,player->y);
 
 	//Reset position
-	player.x = 3;
-	player.y = 0;
+	player->x = 3;
+	player->y = 0;
 
 	//Reset rotation
-	player.selectedBlock.rotation = BLOCK_ROTATION_NONE;
+	player->selectedBlock.rotation = BLOCK_ROTATION_NONE;
 
 	//Select new block randomly
 	Player_selectBlock(&player,blockTypes->blocks[rand()%blockTypes->blockCount]);
 
-	player.fallTimeCounter=0;
+	player->fallTimeCounter=0;
   
   Map_removeLines(map, &gameData->topLineRemoved, &gameData->blockFalling);
   if (gameData->blockFalling){
