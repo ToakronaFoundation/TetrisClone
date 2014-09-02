@@ -22,10 +22,10 @@ struct GameData{
 	struct Player players[4];//TODO: Multiplayer using more flexible data structure
 	unsigned short playerCount;
 	struct Map* map;
-  struct Map* fallingBlocks;
-  unsigned short blockFalling;
-  short topLineRemoved;
-  int animationFallCounter;
+	struct Map* fallingBlocks;
+	unsigned short blockFalling;
+	short topLineRemoved;
+	int animationFallCounter;
 };
 
 void Game_update(struct GameData* gameData,struct GLFWwindow* window);//TODO: Fix input system and remove window parameter
