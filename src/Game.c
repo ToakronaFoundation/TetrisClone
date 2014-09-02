@@ -50,7 +50,7 @@ void Game_blockTouchesBottom(struct GameData* gameData, unsigned short playerInd
 	player->selectedBlock.rotation = BLOCK_ROTATION_NONE;
 
 	//Select new block randomly
-	Player_selectBlock(&player,blockTypes->blocks[rand()%blockTypes->blockCount]);
+	Player_selectBlock(player,blockTypes->blocks[rand()%blockTypes->blockCount]);
 
 	player->fallTimeCounter=0;
   

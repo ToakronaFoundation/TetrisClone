@@ -70,7 +70,7 @@ void Map_removeLines(struct Map* map, short* topLine, unsigned short* linesRemov
  * @param map1  The map to mutate
  * @param map2  The other map
  * @param x     x offset
- * @param y     y offsethttp://en.wikipedia.org/wiki/The_Fragile_%28Nine_Inch_Nails_album%29
+ * @param y     y offset
  */
 
 void Map_merge(struct Map* map1, struct Map* map2, unsigned short x, unsigned short y);
