@@ -9,13 +9,9 @@ struct GLFWwindow;
 
 #define GAME_GRID_SIZE 16
 
-#define GAME_INITIAL_WIDTH  10
-#define GAME_INITIAL_HEIGHT 20
-
 //TODO: These should be a in-game settings
 #define GAME_DOWNKEY_TIME 15
 #define GAME_DOWNKEY_SPEED 2
-#define GAME_FALL_SPEED     60
 
 struct GameData{
 	/**
@@ -32,9 +28,10 @@ struct GameData{
 	/**
 	 * Map data
 	 */
-	struct Map* map;
-	
-	struct Map* fallingBlocks;
+	struct Map* maps[1];
+	unsigned short mapCount;
+
+	struct Map* fallingBlocks;//TODO: Consider moving these to Map and change back the Game_blockTouchesBottom signature to (struct Player* player)
 	unsigned short blockFalling;
 	short topLineRemoved;
 	int animationFallCounter;

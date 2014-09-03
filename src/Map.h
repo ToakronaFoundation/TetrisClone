@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include "Block.h"
 
+#define MAP_DEFAULT_WIDTH  10
+#define MAP_DEFAULT_HEIGHT 20
+
 /**
  * A map is simply a twodimensional array of booleans
  * Indexed by [y][x]

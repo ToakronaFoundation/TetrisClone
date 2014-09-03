@@ -9,6 +9,7 @@ struct Player{
 	unsigned short x;
 	unsigned short y;
 
+	unsigned short fallTime;
 	unsigned short fallTimeCounter;//TODO: Make an abstract controller, in this case both a HumanControl and a FallTimeControl
 	short downKeyCounter;
 

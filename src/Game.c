@@ -12,11 +12,11 @@ void Game_update(struct GameData* gameData,GLFWwindow* window){
 		//For every player
 		for(typeof(gameData->playerCount) i=0; i<gameData->playerCount; ++i){
 			//Increase fall time counter and check if gravity should pull down the player's block at the moment
-			if(++gameData->players[i].fallTimeCounter > GAME_FALL_SPEED){
+			if(++gameData->players[i].fallTimeCounter > gameData->players[i].fallTime){
 				//Move down if the player isn't manually holding the key and moving down the block
-				if(!glfwGetKey(window,GLFW_KEY_DOWN) && !Player_moveY(&gameData->players[i],gameData->map,1))
+				if(!glfwGetKey(window,GLFW_KEY_DOWN) && !Player_moveY(&gameData->players[i],gameData->maps[0],1))
 					//If moving down failed, that means we have a collision, resolve
-					Game_blockTouchesBottom(gameData,i,gameData->map,gameData->blockTypes);
+					Game_blockTouchesBottom(gameData,i,gameData->maps[0],gameData->blockTypes);
 
 				//Reset the fall time counter in any case
 				gameData->players[i].fallTimeCounter=0;
@@ -24,10 +24,10 @@ void Game_update(struct GameData* gameData,GLFWwindow* window){
 		}
 	}
 	else {
-		if(++(gameData->animationFallCounter) == GAME_FALL_SPEED * gameData->blockFalling){
+		if(++(gameData->animationFallCounter) == gameData->players[0].fallTime * gameData->blockFalling){
 			gameData->blockFalling         = 0;
 			gameData->animationFallCounter = 0;
-			Map_merge(gameData->map, gameData->fallingBlocks, 0, gameData->topLineRemoved);
+			Map_merge(gameData->maps[0], gameData->fallingBlocks, 0, gameData->topLineRemoved);
 			free(gameData->fallingBlocks);
 		}
 	}
@@ -38,11 +38,11 @@ void Game_render(struct GameData* gameData){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	//Draw map
-	Map_draw(gameData->map,0,0);
+	Map_draw(gameData->maps[0],0,0);
 
 
 	if(gameData->blockFalling){
-		int quotient = gameData->animationFallCounter / GAME_FALL_SPEED;
+		int quotient = gameData->animationFallCounter / gameData->players[0].fallTime;
 		Map_draw(gameData->fallingBlocks,0, quotient);
 	}
 

@@ -47,19 +47,19 @@ static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifie
 				break;
 			case GLFW_KEY_X:
 				//Rotates right
-				Player_rotateBlockRight(&gameData->players[0],gameData->map);
+				Player_rotateBlockRight(&gameData->players[0],gameData->maps[0]);
 				break;
 			case GLFW_KEY_C:
 				//Rotates left
-				Player_rotateBlockLeft(&gameData->players[0],gameData->map);
+				Player_rotateBlockLeft(&gameData->players[0],gameData->maps[0]);
 				break;
 			case GLFW_KEY_LEFT:
 				//Moves left
-				Player_moveX(&gameData->players[0],gameData->map,-1);
+				Player_moveX(&gameData->players[0],gameData->maps[0],-1);
 				break;
 			case GLFW_KEY_RIGHT:
 				//Moves right
-				Player_moveX(&gameData->players[0],gameData->map,1);
+				Player_moveX(&gameData->players[0],gameData->maps[0],1);
 				break;
 			case GLFW_KEY_DOWN:
 				//Down key repeat
@@ -69,8 +69,19 @@ static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifie
 				gameData->players[0].fallTimeCounter = 0;
 
 				//Move down if not at bottom
-				if(!Player_moveY(&gameData->players[0],gameData->map,1))
-					Game_blockTouchesBottom(gameData, 0,gameData->map,gameData->blockTypes);
+				if(!Player_moveY(&gameData->players[0],gameData->maps[0],1))
+					Game_blockTouchesBottom(gameData, 0,gameData->maps[0],gameData->blockTypes);
+				break;
+		}
+	}else if(action== GLFW_REPEAT){
+		switch(key){
+			case GLFW_KEY_LEFT:
+				//Moves left
+				Player_moveX(&gameData->players[0],gameData->maps[0],-1);
+				break;
+			case GLFW_KEY_RIGHT:
+				//Moves right
+				Player_moveX(&gameData->players[0],gameData->maps[0],1);
 				break;
 		}
 	}
@@ -111,9 +122,9 @@ int main(int argc,const char* argv[]){
 	struct GameData gameData = {.playerCount = 0, .blockFalling = 0, .topLineRemoved = 0, .animationFallCounter = 0};
 	glfwSetWindowUserPointer(gameWindow,&gameData);
 
-	//Initiate gameData.map
-	if(!(gameData.map = Map_alloc(GAME_INITIAL_WIDTH,GAME_INITIAL_HEIGHT))){
-		fprintf(stderr,"Error: Cannot allocate gameData.map with the size %ux%u\n",GAME_INITIAL_WIDTH,GAME_INITIAL_HEIGHT);
+	//Initiate gameData.maps[0]
+	if(!(gameData.maps[0] = Map_alloc(MAP_DEFAULT_WIDTH,MAP_DEFAULT_HEIGHT))){
+		fprintf(stderr,"Error: Cannot allocate gameData.maps[0] with the size %ux%u\n",MAP_DEFAULT_WIDTH,MAP_DEFAULT_HEIGHT);
 		return 1;
 	}
 
@@ -167,9 +178,10 @@ int main(int argc,const char* argv[]){
 	gameData.players[0] = (struct Player){
 		.x = 3,//TODO: Have a default start position defined in Map and initialize players using the Map data
 		.y = 0,
+		.fallTime        = 60,
 		.fallTimeCounter = 0,
-		.downKeyCounter = 0,
-		.selectedBlock = {NULL,NULL,BLOCK_ROTATION_NONE}
+		.downKeyCounter  = 0,
+		.selectedBlock   = {NULL,NULL,BLOCK_ROTATION_NONE}
 	};
 	gameData.playerCount = 1;
 	Player_selectBlock(&gameData.players[0],gameData.blockTypes->blocks[0]);
@@ -186,8 +198,8 @@ int main(int argc,const char* argv[]){
 				gameData.players[0].downKeyCounter = 0;
 
 				//If not able to move down
-				if(!Player_moveY(&gameData.players[0],gameData.map,1)){
-					Game_blockTouchesBottom(&gameData,0,gameData.map,gameData.blockTypes);
+				if(!Player_moveY(&gameData.players[0],gameData.maps[0],1)){
+					Game_blockTouchesBottom(&gameData,0,gameData.maps[0],gameData.blockTypes);
 					gameData.players[0].fallTimeCounter = 0;
 				}
 			}

@@ -20,7 +20,7 @@ list(REMOVE_DUPLICATES INCLUDE_DIRS)
 include_directories(${INCLUDE_DIRS})
 
 ADD_DEFINITIONS(
-	-std=c99
+	-std=gnu99
 	-Wall
 )
 
