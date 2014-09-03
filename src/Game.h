@@ -18,10 +18,22 @@ struct GLFWwindow;
 #define GAME_FALL_SPEED     60
 
 struct GameData{
+	/**
+	 * Represents all the available block types
+	 */
 	const struct BlockTypeData* blockTypes;
+
+	/**
+	 * Player data
+	 */
 	struct Player players[4];//TODO: Multiplayer using more flexible data structure
 	unsigned short playerCount;
+
+	/**
+	 * Map data
+	 */
 	struct Map* map;
+	
 	struct Map* fallingBlocks;
 	unsigned short blockFalling;
 	short topLineRemoved;

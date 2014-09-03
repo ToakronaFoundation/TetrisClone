@@ -9,12 +9,18 @@
 
 void Game_update(struct GameData* gameData,GLFWwindow* window){
 	if(!gameData->blockFalling){
-		if(++gameData->players[0].fallTimeCounter > GAME_FALL_SPEED){
-			//Move down
-			if(!glfwGetKey(window,GLFW_KEY_DOWN) && !Player_moveY(&gameData->players[0],gameData->map,1))
-				//If moving down failed, that means we have a collision, resolve
-				Game_blockTouchesBottom(gameData,0,gameData->map,gameData->blockTypes);
-			gameData->players[0].fallTimeCounter=0;
+		//For every player
+		for(typeof(gameData->playerCount) i=0; i<gameData->playerCount; ++i){
+			//Increase fall time counter and check if gravity should pull down the player's block at the moment
+			if(++gameData->players[i].fallTimeCounter > GAME_FALL_SPEED){
+				//Move down if the player isn't manually holding the key and moving down the block
+				if(!glfwGetKey(window,GLFW_KEY_DOWN) && !Player_moveY(&gameData->players[i],gameData->map,1))
+					//If moving down failed, that means we have a collision, resolve
+					Game_blockTouchesBottom(gameData,i,gameData->map,gameData->blockTypes);
+
+				//Reset the fall time counter in any case
+				gameData->players[i].fallTimeCounter=0;
+			}
 		}
 	}
 	else {
@@ -28,18 +34,28 @@ void Game_update(struct GameData* gameData,GLFWwindow* window){
 }
 
 void Game_render(struct GameData* gameData){
+	//Clear screen
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	//Draw map
 	Map_draw(gameData->map,0,0);
-	if (gameData->blockFalling){
+
+
+	if(gameData->blockFalling){
 		int quotient = gameData->animationFallCounter / GAME_FALL_SPEED;
 		Map_draw(gameData->fallingBlocks,0, quotient);
 	}
+
+	//Draw players' block
 	glColor3f(1.0f,1.0f,1.0f);
-	Block_draw(gameData->players[0].selectedBlock.copy,gameData->players[0].x,gameData->players[0].y);
+	for(typeof(gameData->playerCount) i=0; i<gameData->playerCount; ++i)
+		Block_draw(gameData->players[i].selectedBlock.copy,gameData->players[i].x,gameData->players[i].y);
 }
 
 void Game_blockTouchesBottom(struct GameData* gameData, unsigned short playerIndex, struct Map* map, const struct BlockTypeData* blockTypes){
-	struct Player* player = gameData->players + playerIndex;
+	struct Player*const player = &gameData->players[playerIndex];
+
+	//Imprint (copy paste) block (data) to map with its position
 	Map_imprintBlock(map,player->selectedBlock.copy,player->x,player->y);
 
 	//Reset position
@@ -52,6 +68,7 @@ void Game_blockTouchesBottom(struct GameData* gameData, unsigned short playerInd
 	//Select new block randomly
 	Player_selectBlock(player,blockTypes->blocks[rand()%blockTypes->blockCount]);
 
+	//Reset fall time counter
 	player->fallTimeCounter=0;
 	
 	Map_removeLines(map, &gameData->topLineRemoved, &gameData->blockFalling);

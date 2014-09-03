@@ -46,21 +46,29 @@ static void onKey(GLFWwindow* window,int key,int scanCode,int action,int modifie
 				glfwSetWindowShouldClose(window,true);
 				break;
 			case GLFW_KEY_X:
-				Player_rotateBlockLeft(&gameData->players[0],gameData->map);
-				break;
-			case GLFW_KEY_C:
+				//Rotates right
 				Player_rotateBlockRight(&gameData->players[0],gameData->map);
 				break;
+			case GLFW_KEY_C:
+				//Rotates left
+				Player_rotateBlockLeft(&gameData->players[0],gameData->map);
+				break;
 			case GLFW_KEY_LEFT:
+				//Moves left
 				Player_moveX(&gameData->players[0],gameData->map,-1);
 				break;
 			case GLFW_KEY_RIGHT:
+				//Moves right
 				Player_moveX(&gameData->players[0],gameData->map,1);
 				break;
 			case GLFW_KEY_DOWN:
+				//Down key repeat
 				gameData->players[0].downKeyCounter = -GAME_DOWNKEY_TIME;
+
+				//Automatic fall should not occur when holding down => cancelling current timer
 				gameData->players[0].fallTimeCounter = 0;
 
+				//Move down if not at bottom
 				if(!Player_moveY(&gameData->players[0],gameData->map,1))
 					Game_blockTouchesBottom(gameData, 0,gameData->map,gameData->blockTypes);
 				break;
@@ -157,7 +165,7 @@ int main(int argc,const char* argv[]){
 
 	//Initiate players
 	gameData.players[0] = (struct Player){
-		.x = 3,
+		.x = 3,//TODO: Have a default start position defined in Map and initialize players using the Map data
 		.y = 0,
 		.fallTimeCounter = 0,
 		.downKeyCounter = 0,

@@ -9,9 +9,12 @@ extern inline unsigned short Block_getHeight(const struct Block* block);
 extern inline void Block_setSpacesFromBitlist(struct Block* block,byte* bitlist,size_t size);
 
 struct Block* Block_alloc(unsigned short width,unsigned short height){
+	//Allocate
 	struct Block* block = malloc(sizeof(struct Block) + Bits_sizeof(width*height));
 	if(!block)
 		return NULL;
+
+	//Initialize
 	block->width  = width;
 	block->height = height;
 	return block;
